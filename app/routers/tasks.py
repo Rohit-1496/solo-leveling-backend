@@ -23,6 +23,30 @@ async def get_system_status(player_id: int, db: AsyncSession = Depends(get_db)):
     
     return {"player": player, "tasks": tasks}
 
+@router.post("/system/initialize")
+async def initialize_system(db: AsyncSession = Depends(get_db)):
+    # Check if player 1 exists
+    res = await db.execute(select(Player).where(Player.id == 1))
+    player = res.scalar_one_or_none()
+    
+    if player:
+        return {"status": "Already Initialized", "player": player}
+        
+    # Create the Shadow Monarch
+    jinwoo = Player(
+        id=1, 
+        username="SUNG JINWOO", 
+        level=1, 
+        xp=0, 
+        hp=100, 
+        streak_days=0
+    )
+    db.add(jinwoo)
+    await db.commit()
+    await db.refresh(jinwoo)
+    
+    return {"status": "System Awakened", "player": jinwoo}
+
 @router.get("/tasks", response_model=list[TaskResponse])
 async def get_tasks(player_id: int, db: AsyncSession = Depends(get_db)):
     t_res = await db.execute(select(DailyTask).where(DailyTask.player_id == player_id))
