@@ -27,18 +27,22 @@ const PLAYER_ID = 1;
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
-};
+} as const;
 
 const itemVariants = {
   hidden: { x: -30, opacity: 0 },
-  visible: { x: 0, opacity: 1, transition: { type: "spring", stiffness: 200, damping: 20 } }
-};
+  visible: { 
+    x: 0, 
+    opacity: 1, 
+    transition: { type: "spring", stiffness: 200, damping: 20 } 
+  }
+} as const;
 
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.8, y: 50 },
   visible: { opacity: 1, scale: 1, y: 0 },
   exit: { opacity: 0, scale: 1.1, y: 20 }
-};
+} as const;
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);

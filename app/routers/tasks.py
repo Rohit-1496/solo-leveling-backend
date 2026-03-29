@@ -25,14 +25,14 @@ async def get_system_status(player_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.post("/system/initialize")
 async def initialize_system(db: AsyncSession = Depends(get_db)):
-    # Check if player 1 exists
+    # Check if a player already exists
     res = await db.execute(select(Player).where(Player.id == 1))
     player = res.scalar_one_or_none()
     
     if player:
         return {"status": "Already Initialized", "player": player}
         
-    # Create the Shadow Monarch
+    # Create SUNG JINWOO (The Monarch)
     jinwoo = Player(
         id=1, 
         username="SUNG JINWOO", 
@@ -42,10 +42,13 @@ async def initialize_system(db: AsyncSession = Depends(get_db)):
         streak_days=0
     )
     db.add(jinwoo)
-    await db.commit()
-    await db.refresh(jinwoo)
-    
-    return {"status": "System Awakened", "player": jinwoo}
+    try:
+        await db.commit()
+        await db.refresh(jinwoo)
+        return {"status": "System Awakened", "player": jinwoo}
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Mana Corruption: {str(e)}")
 
 @router.get("/tasks", response_model=list[TaskResponse])
 async def get_tasks(player_id: int, db: AsyncSession = Depends(get_db)):
